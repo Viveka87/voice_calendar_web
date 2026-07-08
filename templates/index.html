@@ -1,0 +1,517 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Voice Reminder</title>
+
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet"
+    href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <style>
+    .popup {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.6);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 9999;
+}
+
+.hidden {
+  display: none;
+}
+
+.popup-box {
+  width: 420px;
+  background: #fff;
+  border-radius: 18px;
+  padding: 20px;
+  box-shadow: 0 20px 50px rgba(0,0,0,0.3);
+  font-family: sans-serif;
+  animation: pop 0.25s ease;
+}
+
+.popup-box h2 {
+  text-align: center;
+  margin-bottom: 15px;
+}
+
+/* 🔥 scroll area */
+.event-list {
+  max-height: 300px;   /* scroll limit */
+  overflow-y: auto;
+  padding-right: 5px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+/* row layout */
+.event-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 12px;
+  border-radius: 12px;
+  color: white;
+}
+
+/* left side (S.No + name) */
+.left {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.sno {
+  font-weight: bold;
+  opacity: 0.9;
+}
+
+.name {
+  font-weight: 600;
+}
+
+/* time */
+.time {
+  font-size: 12px;
+  opacity: 0.9;
+  white-space: nowrap;
+}
+
+/* colorful gradients */
+.color-0 { background: linear-gradient(135deg,#ff6a00,#ee0979); }
+.color-1 { background: linear-gradient(135deg,#00c6ff,#0072ff); }
+.color-2 { background: linear-gradient(135deg,#f7971e,#ffd200); color:#222; }
+.color-3 { background: linear-gradient(135deg,#7f00ff,#e100ff); }
+
+/* button */
+.popup-box button {
+  margin-top: 15px;
+  width: 100%;
+  padding: 10px;
+  border: none;
+  border-radius: 10px;
+  background: #111;
+  color: white;
+  cursor: pointer;
+}
+
+.popup-box button:hover {
+  background: #333;
+}
+
+@keyframes pop {
+  from { transform: scale(0.8); opacity: 0; }
+  to { transform: scale(1); opacity: 1; }
+}
+</style>
+</head>
+
+<body class="bg-gray-100 p-6">
+
+<!-- 🔹 TOP -->
+<div class="bg-white p-6 rounded shadow text-center max-w-xl mx-auto">
+
+  <h1 class="text-2xl mb-4">🎤 Voice Reminder</h1>
+
+  <button onclick="startListening()"
+    class="bg-blue-500 text-white px-4 py-2 rounded">
+    <i class="fas fa-microphone"></i> Speak
+  </button>
+
+  <!-- Toast -->
+  <div id="toast"
+    class="hidden fixed bottom-5 right-5 bg-green-500 text-white px-4 py-2 rounded">
+  </div>
+
+</div>
+
+<!-- 🔻 SPACE -->
+<div class="h-10"></div>
+
+<!-- 🔹 CALENDAR -->
+<div class="bg-white p-6 rounded shadow max-w-6xl mx-auto">
+
+  <div class="flex justify-between mb-4">
+    <button onclick="prevMonth()" class="px-3 py-1 bg-gray-200 rounded">←</button>
+    <h2 id="monthTitle" class="text-xl font-bold"></h2>
+    <button onclick="nextMonth()" class="px-3 py-1 bg-gray-200 rounded">→</button>
+  </div>
+
+  <div class="grid grid-cols-7 text-center text-gray-500 mb-2">
+    <div>Sun</div><div>Mon</div><div>Tue</div>
+    <div>Wed</div><div>Thu</div><div>Fri</div><div>Sat</div>
+  </div>
+
+  <div id="calendar" class="grid grid-cols-7 gap-2"></div>
+
+</div>
+
+<!-- 🔥 POPUP -->
+<div id="overlay"
+     class="fixed inset-0 bg-black/40 hidden flex items-center justify-center z-50"
+     onclick="closePanel()">
+
+  <div onclick="event.stopPropagation()"
+       class="bg-white w-80 max-h-[80vh] rounded-xl shadow-2xl p-4 relative">
+
+    <!-- Close -->
+    <button onclick="closePanel()"
+      class="absolute top-2 right-2 w-6 h-6 flex items-center justify-center 
+             text-gray-500 hover:text-red-500 hover:bg-red-100 rounded-full text-xs">
+      ✕
+    </button>
+
+    <h2 class="text-lg font-semibold mb-3">Events</h2>
+
+    <div id="eventList" class="space-y-3 overflow-y-auto max-h-[60vh]"></div>
+
+  </div>
+</div>
+<div id="editModal"
+     class="hidden fixed inset-0 bg-black/40 flex items-center justify-center z-50">
+
+  <div class="bg-white p-5 rounded-lg shadow w-80">
+
+    <h2 class="text-lg mb-3 font-semibold">Edit Event</h2>
+
+    <input id="editInput"
+           class="border w-full p-2 mb-4 rounded" />
+
+    <div class="flex justify-end gap-2">
+      <button onclick="closeEditModal()"
+        class="px-3 py-1 bg-gray-200 rounded">
+        Cancel
+      </button>
+
+      <button onclick="saveEdit()"
+        class="px-3 py-1 bg-blue-500 text-white rounded">
+        Save
+      </button>
+    </div>
+
+  </div>
+</div>
+
+<div id="todayPopup" class="popup hidden">
+  <div class="popup-box">
+    <h2>📅 Today's Events</h2>
+
+    <div id="popupContent"></div>
+
+    <button onclick="closePopup()">Close</button>
+  </div>
+</div>
+<script>
+
+let currentDate = new Date();
+let selectedDate = null;
+let eventsByDate = {};
+
+/* ================= LOAD EVENTS ================= */
+async function loadEvents() {
+  const res = await fetch("http://127.0.0.1:5000/get-events");
+  const data = await res.json();
+
+  eventsByDate = {};
+
+  data.forEach(e => {
+    const date = e.event_date.slice(0, 10);
+
+    if (!eventsByDate[date]) eventsByDate[date] = [];
+
+    eventsByDate[date].push(e);
+  });
+
+  renderCalendar();
+
+  // 👇 ADD THIS
+  const today = getTodayDate();
+  const todayEvents = eventsByDate[today] || [];
+
+  showTodayPopup(todayEvents);
+}
+function showTodayPopup(events) {
+  if (!events || events.length === 0) return;
+
+  const popup = document.getElementById("todayPopup");
+  const content = document.getElementById("popupContent");
+
+  content.innerHTML = `
+    <div class="event-list">
+      ${events.map((e, i) => `
+        <div class="event-row color-${i % 4}">
+          <div class="left">
+            <span class="sno">${i + 1}.</span>
+            <span class="name">${e.text}</span>
+          </div>
+          <div class="time">⏰ ${e.event_time || "N/A"}</div>
+        </div>
+      `).join("")}
+    </div>
+  `;
+
+  popup.classList.remove("hidden");
+}
+
+function closePopup() {
+  document.getElementById("todayPopup").classList.add("hidden");
+}
+function closePopup() {
+  document.getElementById("todayPopup").classList.add("hidden");
+}
+function getTodayDate() {
+  const today = new Date();
+  return today.toISOString().slice(0, 10);
+}
+/* ================= CALENDAR ================= */
+function renderCalendar() {
+  const calendar = document.getElementById("calendar");
+  calendar.innerHTML = "";
+
+  const year = currentDate.getFullYear();
+  const month = currentDate.getMonth();
+
+  const monthNames = [
+    "January","February","March","April","May","June",
+    "July","August","September","October","November","December"
+  ];
+
+  document.getElementById("monthTitle").innerText =
+    `${monthNames[month]} ${year}`;
+
+  const firstDay = new Date(year, month, 1).getDay();
+  const daysInMonth = new Date(year, month + 1, 0).getDate();
+
+  for (let i = 0; i < firstDay; i++) {
+    calendar.appendChild(document.createElement("div"));
+  }
+
+  for (let i = 1; i <= daysInMonth; i++) {
+
+    const dateStr =
+      `${year}-${String(month+1).padStart(2,'0')}-${String(i).padStart(2,'0')}`;
+
+    const day = document.createElement("div");
+    day.className = "bg-white p-2 h-24 rounded shadow border cursor-pointer";
+
+    day.innerHTML = `<div class="font-bold">${i}</div>`;
+
+    const events = eventsByDate[dateStr] || [];
+
+    events.slice(0,2).forEach(e => {
+      const div = document.createElement("div");
+      div.className = "text-xs text-blue-600 truncate";
+      div.innerText = `${e.event_time.slice(0,5)} ${e.text}`;
+      day.appendChild(div);
+    });
+
+    day.onclick = () => openPopup(dateStr, events);
+
+    calendar.appendChild(day);
+  }
+}
+
+/* ================= POPUP ================= */
+function openPopup(date, events) {
+  selectedDate = date;
+
+  const overlay = document.getElementById("overlay");
+  const list = document.getElementById("eventList");
+
+  overlay.classList.remove("hidden");
+
+  list.innerHTML = `<h3 class="text-sm mb-2 font-semibold">${date}</h3>`;
+
+  const now = new Date();
+
+  events
+    .sort((a, b) => a.event_time.localeCompare(b.event_time))
+    .forEach(e => {
+
+      const eventDateTime = new Date(`${date}T${e.event_time}`);
+      const isFuture = eventDateTime > now;
+
+      list.innerHTML += `
+        <div class="flex justify-between items-center bg-gray-50 p-3 rounded shadow">
+
+          <div>
+            <p class="text-xs text-blue-500">
+              ${e.event_time.slice(0,5)}
+            </p>
+            <p class="text-sm text-gray-800">
+              ${e.text}
+            </p>
+          </div>
+
+          ${
+            isFuture
+              ? `
+              <div class="flex gap-3">
+                
+                <!-- ✏️ EDIT -->
+                <button onclick="openEditModal(${e.id}, '${e.text}')"
+                  class="text-blue-500 hover:text-blue-700">
+                  <i class="fas fa-pen"></i>
+                </button>
+
+                <!-- 🗑 DELETE -->
+                <button onclick="confirmDelete(${e.id})"
+                  class="text-red-500 hover:text-red-700">
+                  <i class="fas fa-trash"></i>
+                </button>
+
+              </div>
+              `
+              : ""
+          }
+
+        </div>
+      `;
+    });
+
+  if (events.length === 0) {
+    list.innerHTML += `<p class="text-gray-400 text-center">No events</p>`;
+  }
+}
+
+function closePanel() {
+  document.getElementById("overlay").classList.add("hidden");
+}
+
+/* ================= DELETE ================= */
+function confirmDelete(id) {
+
+  if(!confirm("Delete this event?")) return;
+
+  fetch("http://127.0.0.1:5000/delete-event/"+id,{
+    method:"DELETE"
+  })
+  .then(()=>{
+    showToast("Deleted");
+
+    // remove from memory
+    for(let d in eventsByDate){
+      eventsByDate[d]=eventsByDate[d].filter(e=>e.id!==id);
+    }
+
+    renderCalendar();
+
+    if(selectedDate){
+      openPopup(selectedDate, eventsByDate[selectedDate]||[]);
+    }
+  });
+}
+
+/* ================= VOICE ================= */
+function startListening(){
+  const recognition = new webkitSpeechRecognition();
+
+  recognition.onresult = function(event){
+    let text = event.results[0][0].transcript;
+
+    fetch("http://127.0.0.1:5000/add-event",{
+      method:"POST",
+      headers:{"Content-Type":"application/json"},
+      body:JSON.stringify({text:text})
+    })
+    .then(()=>{
+      showToast("Saved");
+      loadEvents();
+    });
+  };
+
+  recognition.start();
+}
+
+/* ================= TOAST ================= */
+function showToast(msg){
+  const t=document.getElementById("toast");
+  t.innerText=msg;
+  t.classList.remove("hidden");
+
+  setTimeout(()=>t.classList.add("hidden"),2000);
+}
+
+/* ================= NAV ================= */
+function nextMonth(){
+  currentDate.setMonth(currentDate.getMonth()+1);
+  renderCalendar();
+}
+
+function prevMonth(){
+  currentDate.setMonth(currentDate.getMonth()-1);
+  renderCalendar();
+}
+let editId = null;
+
+function openEditModal(id, text) {
+  editId = id;
+
+  document.getElementById("editInput").value = text;
+  document.getElementById("editModal").classList.remove("hidden");
+}
+
+function closeEditModal() {
+  document.getElementById("editModal").classList.add("hidden");
+}
+
+
+function updateEvent(id, text) {
+
+  fetch("http://127.0.0.1:5000/update-event/" + id, {
+    method: "PUT",
+    headers: {"Content-Type": "application/json"},
+    body: JSON.stringify({ text: text })
+  })
+  .then(res => {
+    if (!res.ok) {
+      return res.text().then(err => {
+        console.log("ERROR:", err);
+        throw new Error("Server error");
+      });
+    }
+    return res.json();
+  })
+  .then(() => {
+    showToast("Updated!");
+    loadEvents();   // 🔥 refresh data
+  });
+}
+
+function saveEdit() {
+  const newText = document.getElementById("editInput").value;
+
+  fetch("http://127.0.0.1:5000/update-event/" + editId, {
+    method: "PUT",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ text: newText })
+  })
+  .then(res => res.json())
+  .then(() => {
+
+    showToast("Updated");
+
+    // 🔥 update locally (no refresh)
+    for (let d in eventsByDate) {
+      eventsByDate[d].forEach(e => {
+        if (e.id === editId) {
+          e.text = newText;
+        }
+      });
+    }
+
+    renderCalendar();
+    openPopup(selectedDate, eventsByDate[selectedDate] || []);
+
+    closeEditModal();
+  });
+}
+/* ================= INIT ================= */
+window.onload=loadEvents;
+
+</script>
+
+</body>
+</html>
