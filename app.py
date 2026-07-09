@@ -14,7 +14,9 @@ import time
 
 app = Flask(__name__)
 CORS(app)
-
+@app.route("/")
+def home():
+    return "Voice Calendar App is Running 🚀"
 # MySQL connection
 def get_db():
  db = mysql.connector.connect(
