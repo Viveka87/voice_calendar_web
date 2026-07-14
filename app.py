@@ -144,6 +144,8 @@ def get_events():
     
 @app.route('/add-event', methods=['POST'])
 def add_event():
+    print("REQUEST DATA:", request.data)
+    print("REQUEST JSON:", request.json)
     data = request.json
     raw_text = data.get("text", "").strip()
     text_lower = raw_text.lower()
