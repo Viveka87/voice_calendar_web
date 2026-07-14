@@ -24,7 +24,36 @@ CORS(app)
 #     database="voice_app"
 # )
 #  return db
+@app.route('/debug-insert')
+def debug_insert():
+    import os
+    try:
+        db = get_db()
+        cursor = db.cursor()
 
+        cursor.execute(
+            "INSERT INTO events (text, event_date, event_time) VALUES (%s, %s, %s)",
+            ("test event", "2026-07-14", "12:00:00")
+        )
+        db.commit()
+
+        cursor.execute("SELECT * FROM events")
+        data = cursor.fetchall()
+
+        return {
+            "status": "success",
+            "data": str(data),
+            "host": os.getenv("MYSQLHOST"),
+            "db": os.getenv("MYSQLDATABASE")
+        }
+
+    except Exception as e:
+        return {
+            "status": "error",
+            "error": str(e),
+            "host": os.getenv("MYSQLHOST"),
+            "user": os.getenv("MYSQLUSER")
+        }
 import threading
 import time
 
