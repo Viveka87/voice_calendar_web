@@ -19,7 +19,7 @@ def get_db():
         database=os.getenv("MYSQLDATABASE"),
         port=int(os.getenv("MYSQLPORT", 3306)),
         ssl={"ssl": {}}   # 🔥 important for many cloud DBs
-        connect_timeout=10 
+        #connect_timeout=10 
     )
     print("HOST:", os.getenv("MYSQLHOST"))
     print("DB:", os.getenv("MYSQLDATABASE"))
