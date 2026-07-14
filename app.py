@@ -14,18 +14,16 @@ import time
 
 app = Flask(__name__)
 CORS(app)
-@app.route("/")
-def home():
-    return "Voice Calendar App is Running 🚀"
+
 # MySQL connection
-def get_db():
- db = mysql.connector.connect(
-    host="localhost",
-    user="root",
-    password="",
-    database="voice_app"
-)
- return db
+# def get_db():
+#  db = mysql.connector.connect(
+#     host="localhost",
+#     user="root",
+#     password="",
+#     database="voice_app"
+# )
+#  return db
 
 import threading
 import time
@@ -509,6 +507,7 @@ threading.Thread(target=run_scheduler, daemon=True).start()
 
 
 if __name__ == '__main__':
-    app.run(debug=True)
-    port = int(os.environ.get("PORT", 5000))
-    app.run(host="0.0.0.0", port=port)
+    app.run()
+    # app.run(debug=True)
+    # port = int(os.environ.get("PORT", 5000))
+    # app.run(host="0.0.0.0", port=port)
