@@ -211,16 +211,17 @@ let eventsByDate = {};
 
 /* ================= LOAD EVENTS ================= */
 async function loadEvents() {
-  //const res = await fetch("http://127.0.0.1:5000/get-events");
-  const res=fetch("https://voice-calendar-web.onrender.com/get-events")
+  const res = await fetch("https://voice-calendar-web.onrender.com/get-events");
   const data = await res.json();
 
   eventsByDate = {};
-   // 👉 ADD TEST EVENT HERE
+
+  // 👉 test event (optional)
   data.push({
     event_date: "2026-07-15",
     title: "Test Event"
   });
+
   data.forEach(e => {
     const date = e.event_date.slice(0, 10);
 
@@ -231,7 +232,6 @@ async function loadEvents() {
 
   renderCalendar();
 
-  // 👇 ADD THIS
   const today = getTodayDate();
   const todayEvents = eventsByDate[today] || [];
 
