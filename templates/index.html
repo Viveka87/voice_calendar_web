@@ -467,7 +467,8 @@ function closeEditModal() {
 
 function updateEvent(id, text) {
 
-  fetch("http://127.0.0.1:5000/update-event/" + id, {
+  //fetch("http://127.0.0.1:5000/update-event/" + id, {
+  fetch("https://voice-calendar-web.onrender.com/update-event/" + id, {
     method: "PUT",
     headers: {"Content-Type": "application/json"},
     body: JSON.stringify({ text: text })
@@ -490,7 +491,8 @@ function updateEvent(id, text) {
 function saveEdit() {
   const newText = document.getElementById("editInput").value;
 
-  fetch("http://127.0.0.1:5000/update-event/" + editId, {
+  //fetch("http://127.0.0.1:5000/update-event/" + editId, {
+  fetch("https://voice-calendar-web.onrender.com/update-event/" + editId, {
     method: "PUT",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ text: newText })
