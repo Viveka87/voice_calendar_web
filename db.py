@@ -11,17 +11,27 @@
 
 import pymysql
 import os
+
 def get_db():
-    print("HOST:", os.getenv("MYSQLHOST"))
-    print("USER:", os.getenv("MYSQLUSER"))
-    print("DB:", os.getenv("MYSQLDATABASE"))
-    return pymysql.connect(
-        host=os.getenv("MYSQLHOST"),
-        user=os.getenv("MYSQLUSER"),
-        password=os.getenv("MYSQLPASSWORD"),
-        database=os.getenv("MYSQLDATABASE"),
-        port=int(os.getenv("MYSQLPORT", 3306)),
-        ssl={"ssl": {}}   # 🔥 important for many cloud DBs
-        #connect_timeout=10 
+    host = os.getenv("MYSQLHOST")
+    user = os.getenv("MYSQLUSER")
+    password = os.getenv("MYSQLPASSWORD")
+    database = os.getenv("MYSQLDATABASE")
+    port = int(os.getenv("MYSQLPORT", 3306))
+
+    print("HOST:", host)
+    print("USER:", user)
+    print("DB:", database)
+    print("PORT:", port)
+
+    conn = pymysql.connect(
+        host=host,
+        user=user,
+        password=password,
+        database=database,
+        port=port,
+        connect_timeout=10
     )
-    
+
+    print("✅ DB CONNECTED SUCCESSFULLY")
+    return conn
