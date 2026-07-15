@@ -17,21 +17,25 @@ def get_db():
     user = os.getenv("MYSQLUSER")
     password = os.getenv("MYSQLPASSWORD")
     database = os.getenv("MYSQLDATABASE")
-    port = int(os.getenv("MYSQLPORT", 3306))
+    port = int(os.getenv("MYSQLPORT"))
 
     print("HOST:", host)
     print("USER:", user)
     print("DB:", database)
     print("PORT:", port)
 
-    conn = pymysql.connect(
-        host=host,
-        user=user,
-        password=password,
-        database=database,
-        port=port,
-        connect_timeout=10
-    )
+    try:
+        conn = pymysql.connect(
+            host=host,
+            user=user,
+            password=password,
+            database=database,
+            port=port,
+            connect_timeout=10
+        )
+        print("✅ CONNECTED TO RAILWAY DB")
+        return conn
 
-    print("✅ DB CONNECTED SUCCESSFULLY")
-    return conn
+    except Exception as e:
+        print("❌ DB ERROR:", e)
+        return None
