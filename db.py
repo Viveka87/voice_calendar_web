@@ -12,6 +12,9 @@
 import pymysql
 import os
 def get_db():
+    print("HOST:", os.getenv("MYSQLHOST"))
+    print("USER:", os.getenv("MYSQLUSER"))
+    print("DB:", os.getenv("MYSQLDATABASE"))
     return pymysql.connect(
         host=os.getenv("MYSQLHOST"),
         user=os.getenv("MYSQLUSER"),
@@ -21,5 +24,4 @@ def get_db():
         ssl={"ssl": {}}   # 🔥 important for many cloud DBs
         #connect_timeout=10 
     )
-    print("HOST:", os.getenv("MYSQLHOST"))
-    print("DB:", os.getenv("MYSQLDATABASE"))
+    
