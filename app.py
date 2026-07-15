@@ -103,7 +103,7 @@ def get_events():
     try:
         db = get_db()
         #cursor = db.cursor(dictionary=True)
-        cursor = conn.cursor(pymysql.cursors.DictCursor)
+        cursor = db.cursor(pymysql.cursors.DictCursor)
             
         cursor.execute("SELECT * FROM events")
         events = cursor.fetchall()
@@ -480,7 +480,7 @@ def delete_event(event_id):
     db = get_db()
     #cursor = db.cursor()
     cursor = db.cursor(pymysql.cursors.DictCursor)
-    
+
     cursor.execute(
         "DELETE FROM events WHERE id = %s",
         (event_id,)
