@@ -211,7 +211,8 @@ let eventsByDate = {};
 
 /* ================= LOAD EVENTS ================= */
 async function loadEvents() {
-  const res = await fetch("http://127.0.0.1:5000/get-events");
+  //const res = await fetch("http://127.0.0.1:5000/get-events");
+  const res=fetch("https://voice-calendar-web.onrender.com/get-events")
   const data = await res.json();
 
   eventsByDate = {};
@@ -389,7 +390,8 @@ function confirmDelete(id) {
 
   if(!confirm("Delete this event?")) return;
 
-  fetch("http://127.0.0.1:5000/delete-event/"+id,{
+ // fetch("http://127.0.0.1:5000/delete-event/"+id,{
+  fetch("https://voice-calendar-web.onrender.com/delete-event/"+id,{
     method:"DELETE"
   })
   .then(()=>{
@@ -415,7 +417,8 @@ function startListening(){
   recognition.onresult = function(event){
     let text = event.results[0][0].transcript;
 
-    fetch("http://127.0.0.1:5000/add-event",{
+    //fetch("http://127.0.0.1:5000/add-event",{
+    fetch("https://voice-calendar-web.onrender.com/add-event",{
       method:"POST",
       headers:{"Content-Type":"application/json"},
       body:JSON.stringify({text:text})
