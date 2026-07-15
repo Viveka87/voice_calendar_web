@@ -215,7 +215,11 @@ async function loadEvents() {
   const data = await res.json();
 
   eventsByDate = {};
-
+   // 👉 ADD TEST EVENT HERE
+  data.push({
+    event_date: "2026-07-15",
+    title: "Test Event"
+  });
   data.forEach(e => {
     const date = e.event_date.slice(0, 10);
 
