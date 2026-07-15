@@ -6,6 +6,8 @@ from dateparser.search import search_dates
 from datetime import timedelta, datetime, date
 from dateutil.parser import parse
 import re
+
+import pymysql
 from db import get_db
 from events.event_queries import get_today_events_db, get_week_events_db
 from email_service.sender import send_email
@@ -100,8 +102,9 @@ from datetime import timedelta, datetime, date
 def get_events():
     try:
         db = get_db()
-        cursor = db.cursor(dictionary=True)
-
+        #cursor = db.cursor(dictionary=True)
+        cursor = conn.cursor(pymysql.cursors.DictCursor)
+            
         cursor.execute("SELECT * FROM events")
         events = cursor.fetchall()
 
@@ -337,7 +340,7 @@ def add_event():
 
     db = get_db()
     cursor = db.cursor()
-
+ 
     cursor.execute(
         "INSERT INTO events (text, event_date, event_time) VALUES (%s, %s, %s)",
         (cleaned_text, event_date, event_time.strftime("%H:%M:%S"))
@@ -371,8 +374,9 @@ def update_event(id):
     # DB CONNECT
     # =========================
     db = get_db()
-    cursor = db.cursor(dictionary=True)
-
+    #cursor = db.cursor(dictionary=True)
+    cursor = db.cursor(pymysql.cursors.DictCursor)
+    
     # =========================
     # GET OLD EVENT
     # =========================
@@ -474,8 +478,9 @@ def update_event(id):
 @app.route('/delete-event/<int:event_id>', methods=['DELETE'])
 def delete_event(event_id):
     db = get_db()
-    cursor = db.cursor()
-
+    #cursor = db.cursor()
+    cursor = db.cursor(pymysql.cursors.DictCursor)
+    
     cursor.execute(
         "DELETE FROM events WHERE id = %s",
         (event_id,)
