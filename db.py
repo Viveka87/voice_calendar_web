@@ -31,7 +31,7 @@ def get_db():
             password=password,
             database=database,
             port=port,
-            connect_timeout=10
+            #connect_timeout=10
         )
         print("✅ CONNECTED TO RAILWAY DB")
         return conn
