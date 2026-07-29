@@ -13,6 +13,7 @@ from events.event_queries import get_today_events_db, get_week_events_db
 from email_service.sender import send_email
 import threading
 import time
+from flask import send_from_directory
 
 app = Flask(__name__)
 CORS(app)
@@ -26,6 +27,11 @@ CORS(app)
 #     database="voice_app"
 # )
 #  return db
+
+@app.route('/sw.js')
+def sw():
+    return send_from_directory('.', 'sw.js')
+
 @app.route('/debug-insert')
 def debug_insert():
     import os
@@ -523,7 +529,7 @@ def weekly_job():
 # ✅ SET SCHEDULE TIMES
 
 # Daily at 6:00 AM
-schedule.every().day.at("18:00").do(daily_job)
+schedule.every().day.at("06:00").do(daily_job)
 
 # Weekly Sunday at 9:00 PM
 schedule.every().sunday.at("21:00").do(weekly_job)
