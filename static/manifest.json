@@ -4,6 +4,7 @@
   "short_name": "VoiceCal",
   "start_url": "/",
   "display": "standalone",
+  "display_override": ["standalone", "minimal-ui"],
   "background_color": "#ffffff",
   "theme_color": "#0d6efd",
   "icons": [
