@@ -1,7 +1,7 @@
 {
   "id": "/",
   "name": "Voice Calendar",
-  "short_name": "VoiceCal",
+  "short_name": "VoiceScheduler",
   "start_url": "/",
   "scope": "/",
   "display": "standalone",
