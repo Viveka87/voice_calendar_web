@@ -526,6 +526,12 @@ function saveEdit() {
 window.onload=loadEvents;
 
 </script>
-
+<script>
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('/static/sw.js')
+    .then(() => console.log("SW registered"))
+    .catch(err => console.log("SW error", err));
+}
+</script>
 </body>
 </html>
