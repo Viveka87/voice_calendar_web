@@ -3,19 +3,30 @@
   "name": "Voice Calendar",
   "short_name": "VoiceCal",
   "start_url": "/",
+  "scope": "/",
   "display": "standalone",
   "display_override": ["standalone", "minimal-ui"],
   "background_color": "#ffffff",
   "theme_color": "#0d6efd",
+  "description": "Voice-based reminder and calendar app",
+
   "icons": [
     {
-      "src": "/static/icon-192.png",
+      "src": "icon-192.png",
       "sizes": "192x192",
       "type": "image/png"
     },
     {
-      "src": "/static/icon-512.png",
+      "src": "icon-512.png",
       "sizes": "512x512",
+      "type": "image/png"
+    }
+  ],
+
+  "screenshots": [
+    {
+      "src": "screenshot1.png",
+      "sizes": "540x720",
       "type": "image/png"
     }
   ]
